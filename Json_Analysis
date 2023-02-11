@@ -1,0 +1,79 @@
+import json
+
+
+# a dictionary object
+new_data={
+        "banner_country": "v2_prime_staging",
+        "definition_bucket": "v2_prime_staging",
+        "gcs_temp_bucket_name": "v2_prime_staging",
+        "batch_id": "multiopticas_test",
+        "entity": "Products",
+        "file_id": "v2_prime_staging/PortugalMultiopticas/Inbound/Products/portugal_multiopticas_hashed_regular_load",
+        "output_path": "gs://v2_prime_staging/PortugalMultiopticas/Outbound/Products",
+        "file_path": "gs://v2_prime_staging/PortugalMultiopticas/Inbound/Products/portugal_multiopticas_regular_loads_Products.csv",
+        "env": "staging",
+        "summary_bigquery_table_name": "",
+        "core_dataset_name": "",
+        "base_url": "https://developerhub-dev.gvc360.io",
+        "definition_path": "configs/PortugalMultiopticas/portugal_multiopticas_sandbox_inbound_definition_1.json"
+        
+    }
+
+# converting a dictionary object to a json object
+
+json_obj=json.dumps(new_data,indent=4)
+
+# converting a json object to python object
+py_obj=json.loads(json_obj)
+
+
+# we can check our object is in form of python dictionary
+
+#print(py_obj)
+
+
+#  dumping a json object to create a user in json object.
+# creaing a class object 
+class user:
+    def __init__(self,name,age):
+        self.name=name
+        self.age=age
+
+
+# creating a instance of the class
+user1=user("Aryan",34)
+#us_json=json.dumps(user1)    #  TypeError: Object of type user is not JSON serializable
+
+# for making this object serionizable we have to use a custom function for conversion
+
+def encoding(o):
+    if isinstance(o,user):
+        return {'name':o.name,'age':o.age,o.__class__.__name__:True}
+    else:
+        raise TypeError('Object of type user is NOT serializable ')
+
+# to dumping the json loads by using the function
+userJSON=json.dumps(user1,default=encoding)
+# returning the user.
+print(userJSON)
+
+# using the class method
+from json import JSONEncoder
+
+class UserEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o,user):
+            return {'name':o.name,'age':o.age,o.__class__.__name__:True}
+        else:
+            raise TypeError('Object of type user is NOT serializable ')
+UserEncoder().default(user1)
+# converting the json object to the python object
+
+py_json=json.loads(userJSON)
+print(py_json)              # {'name': 'Aryan', 'age': 34, 'user': True}
+
+
+
+
+
+
