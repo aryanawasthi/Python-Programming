@@ -1,0 +1,43 @@
+class Person:
+    def __init__(self,name,age,city):
+        self.name=name
+        self.age=age
+        self.city=city
+
+    def __repr__(self) -> str:
+        return "Person(name={},age={},city={})".format(self.name,self.age,self.city)
+    
+    def __eq__(self,other):
+        return (self.name,self.age,self.city)==(other.name,other.age,other.city)
+
+p1=Person("Aryan",34,"Bareilly")
+
+print(p1)           #<__main__.Person object at 0x7f2ef25cfb80>
+
+# Let us change the represntation of  the class object using teh repr function
+# Person(name=Aryan,age=34,city=Bareilly)
+
+
+# Now Let us compare two objects with same values whether they are equal or not.
+
+p3=Person("Aryan",34,"Bareilly")
+#print(p1==p3)   # False   As we can see all the  variables have same values but still it is giving values as False
+
+# Changing the inbuilt comparision function
+print(p1==p3)       # True
+
+from dataclasses import dataclass
+
+@dataclass
+class newPerson:
+    name: str
+    age:  int
+    city: str
+
+p13=newPerson("Aryan",34,"Bareilly")
+p14=newPerson("Aryan",34,"Bareilly")
+
+print(p13)    #newPerson(name='Aryan', age=34, city='Bareilly')
+print(p13==p14)   # True  
+
+# Data classes offfers some of the inbuuillt function such as repr and __eq__ to help the definition of  variables easily.
