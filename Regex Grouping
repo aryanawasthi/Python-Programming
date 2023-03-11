@@ -1,0 +1,177 @@
+# Here We will understand about grouping of regex patters as regex groups helps us to create new sub-patterns and extract information from the matched pattern.
+
+import re
+import logging
+
+logging.basicConfig(filemode="log.log",level=logging.INFO)
+logger=logging.getLogger(__name__)
+
+regex=re.compile(r"(\d-\w){1,3}")
+res=regex.match("1-a3-b")
+#print(res)
+
+# Let'see another case when we have to find for repetitive ab and c
+new_regex=re.compile(r"(ab)+c")
+res=new_regex.match("abababc")
+#print(res)
+
+# Suppose we have to limit the iteration for e.g we have to filter values only India or Indian then we will use the regex criteria
+
+new_regex=re.compile(r"India|an")
+res=new_regex.match("India") 
+#print(res)   # <re.Match object; span=(0, 5), match='India'>
+res=new_regex.match("Indian")
+#print(res)  #<re.Match object; span=(0, 5), match='India'> 
+
+# It will also matches the finding about the 
+new_regex=re.compile(r"India|an")
+res=new_regex.match("an")
+#print(res)      #<re.Match object; span=(0, 2), match='an'>
+# As we can see that it is also matching an here so we will try to group the first characters
+new_regex=re.compile(r"Indi[a|an]")
+res=new_regex.match(r"an")
+#print(res)   # None
+
+# As we can see that if add a closed bracket and add a straight line we can select the characters for fidning the regex
+""" Let's see another key feature of grouping, capturing. Groups also capture the
+matched pattern, so you can use them later in several operations, such as sub
+or in the regex itself. """
+
+reg_pattern=re.compile(r"(\d+)-(\w+)")
+res=reg_pattern.finditer("1-a\n3-d\n4-e")
+
+
+#    print(i.start,i.end,i.groups())
+
+""" <built-in method start of re.Match object at 0x7f06dbd08180> <built-in method end of re.Match object at 0x7f06dbd08180> ('1', 'a')
+<built-in method start of re.Match object at 0x7f06dbd087c0> <built-in method end of re.Match object at 0x7f06dbd087c0> ('3', 'd') """
+
+
+#for i in res:
+#    print(i.group())
+
+
+""" 
+BackRefernces:  It helps us to match the instances of groups repeatedly like if we have multiple groups and we want to comapre and extract only those values
+which are same as group value """
+
+new_regex=re.compile(r"(\w+) \1")
+res=new_regex.search(r"hello hello hello")
+#print(res.groups())
+
+
+# Named Groups:  We can also name the groups 
+pattern=re.compile(r"(\w+) (\w+)")
+match=pattern.search("Hello World")
+#print(match)
+
+#print(match.group(1))   #Hello
+#print(match.group(2))   # World
+
+# To add naming to the groups we will add a P tag with < Names > in the finding then we can have find the value .
+# Nameing the groups as first and second
+name_pattern=re.compile(r"(?P<first>\w+) (?P<Second>\w+)")
+res=name_pattern.search("Hello World")
+# Accessing the first group
+#print(res.group("first"))
+# Accessing the second group
+#print(res.group("Second"))
+
+# To use the substitute we will have to use the \g tag , Let us explore this.
+
+pattern=re.compile(r"(?P<name>\w+) (?P<id>\d+)")
+res=pattern.findall("Aryan 1345Awasthi 3434")
+
+""" for i in res:
+    print(i)
+ """
+
+# Non Capturing Groups : Creating groups without capturing data .
+#res=re.search("Espan(a|ol)","Espanol")
+#print(res.groups())     # As we can see it is still collecting the groups we will use the non auto capturing groups 
+# If we want that groups would not be captured but still we can find the match
+res=re.search("Espan(?:a|ol)","Espanol")
+#print(res.groups())   # ()
+# As we can see now we are not able to capture the groups 
+
+#Atomic Groups:  They are special cases of non capturing  groups where we can do backtracking and helps us to improve the performance y not iterating all
+# Possible combinations.
+import time
+import regex
+start_time=time.time()
+data="aaaaaaabbbbbbaaaaaccccddddaaa"
+res=regex.match("(\w+)-\d",data)
+#print(res)
+final_time=time.time()-start_time
+
+#print(f"The duration of the operation is {final_time}")
+logger.info(f"The Duration of Regex is {final_time}")
+
+# Using the Normal Regex Operation which we do 
+
+start_time=time.time()
+data="aaaaaaabbbbbbaaaaaccccddddaaa"
+res=regex.match("(\w+)-\d",data)
+#print(res)
+final_time=time.time()-start_time
+logger.info(f"The total time with basic re module is {final_time}")
+#print(f"The duration of the operation is {final_time}")
+
+
+# But From Results we can see that basic re if effecient as comapared to Atomic Groups 
+
+
+# YES PATTERN| NO PATTERN : Very Similar to the if- else condition. The Syntax is (?id/name) yes-pattern|no-pattern)
+pattern=re.compile(r"(\d\d-)?(\w{3,4})(?(1)(-\d\d))")
+res=pattern.match("34-erte-34")
+#print(res)  #<re.Match object; span=(0, 10), match='34-erte-34'>
+# As we can see when we have country code -address and address code when matched it is showing the correct value
+# Let us check when we dont have to dont have country code.
+
+res=pattern.match("erte")
+#print(res)  # <re.Match object; span=(0, 4), match='erte'>
+# As we can see without even having the country code it is matching the object
+
+# Now Let us add the condition of adding thee second no condition, it will be helpful
+new_pattern=re.compile(r"(\d\d-)?(\w{3,4})-(?(1)(\d\d)|[a-z]{3,4})$")
+res=new_pattern.search("13-hell-34")
+new_res=pattern.search("HELL-134")
+#print(res)
+#print(new_res)  #<re.Match object; span=(0, 4), match='HELL'> [ As we can see it is able to find a match when we dont have country code]
+res_b=new_pattern.search("hell")
+logger.info("Checking for only string")
+#print(res_b)        # None As we can see that either it will have a string like arlo-arl or it will have arlo-13 otherwise it will not match anything.
+
+regex_pattern=re.compile(r"(a|b)+")
+res=regex_pattern.findall("abaca")
+#print(res)          # ['a', 'a'] Why we are getting 'a','a' other than not finding aba and a and suppose we want to capture all the groups but at the end we
+# have only a or b at the end of the character
+
+# To get the aggregated values as aba and a 
+up_pattern=re.compile(r"(?:a|b)+")
+res=up_pattern.findall("abaca")
+#print(res)
+
+new_pattern=re.compile(r"(?:ab|bb)+")
+res=new_pattern.findall("abbaabb")      # ['ab', 'ab'] It can only happend if it consume characters for e.g is ab is consumed from string the ab baabb and next ab is also conusmed so we get groups for only ab
+#print(res)
+
+# Let us check it with some other values
+new_pattern=re.compile (f"Indi(a|an)")
+#res=new_pattern.findall("India")  #['India']
+res=new_pattern.findall(r"Indian")
+#print(res)
+
+
+
+# If we want that regex does not compile the character then we can use ?: then we can get all the groups for e.g
+up_pattern=re.compile(r"(?:a|b)+") 
+res=up_pattern.findall("abbaabb")      # ["ab",'ab'] It is still taking the ab and ab as with each loop it is overpass the first characters
+
+print(res)
+
+
+
+
+
+
